@@ -15,7 +15,7 @@ my $module = 'DBIx::PivotQuery';
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
-%module = (
+my %module = (
     NAME                => $module,
     AUTHOR              => q{Max Maischein <corion@cpan.org>},
     VERSION_FROM        => $main_file,
