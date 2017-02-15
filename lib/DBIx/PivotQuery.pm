@@ -32,7 +32,7 @@ DBIx::PivotQuery - create pivot tables from queries
     from mytable
   SQL
 
-  
+
 =head1 FUNCTIONS
 
 =head2 pivot_sql
@@ -225,10 +225,51 @@ sub pivot_list( %options ) {
 # This should maybe return a duck-type statement handle so that people
 # can fetch row-by-row to their hearts content
 # row-by-row still means we need to know all values for the column key :-/
-sub pivot_by( %options ) {
-    croak unless $options{sql};
-    croak unless $options{dbh};
 
+=head2 C<< pivot_by >>
+
+    my $l = pivot_by(
+        dbh     => $test_dbh,
+        rows    => ['region'],
+        columns => ['date'],
+        aggregate => ['sum(amount) as amount'],
+        placeholder_values => [],
+        sql => <<'SQL',
+      select
+          region
+        , "date"
+        , amount
+        , customer
+      from mytable
+    SQL
+    );
+
+Transforms the SQL given and returns an AoA pivot table according to
+C<rows>, C<columns> and C<aggregate>.
+
+The last word (<c>\w+</c>) of each element of C<aggregate> will be used as the
+aggregate column name unless C<aggregate_columns> is given.
+
+=cut
+
+sub pivot_by( %options ) {
+    croak "Need an SQL string in option 'sql'"
+        unless $options{sql};
+    croak "Need a database handle in option 'dbh'"
+        unless $options{dbh};
+    $options{ placeholder_values } ||= [];
+
+    my $sql = pivot_sql( %options );
+    my $sth = $options{ dbh }->prepare( $sql );
+    $sth->execute( @{$options{ placeholder_values }} );
+    my $rows = $sth->fetchall_arrayref({});
+    my @aggregate_columns;
+    if( exists $options{ aggregate_columns }) {
+        @aggregate_columns = @{ $options{ aggregate_columns }};
+    } else {
+        @aggregate_columns = map {/(\w+)\w*$/ ? $1 : $_ } @{ $options{ aggregate }};
+    };
+    pivot_list( %options, aggregate => \@aggregate_columns, list => $rows );
 }
 
 1;
