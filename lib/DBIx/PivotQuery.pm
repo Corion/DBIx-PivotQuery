@@ -20,7 +20,7 @@ DBIx::PivotQuery - create pivot tables from queries
 
   use DBIx::PivotQuery 'pivot_by';
   my $rows = pivot_by(
-      dbh => $dbh,
+      dbh       => $dbh,
       columns   => ['report_year'],
       rows      => ['region'],
       aggregate => ['sum(amount) as amount'],
@@ -32,29 +32,72 @@ DBIx::PivotQuery - create pivot tables from queries
     from mytable
   SQL
 
+  
+=head1 FUNCTIONS
+
+=head2 pivot_sql
+
+  pivot_sql(
+      columns => ['date'],
+      rows    => ['region'],
+      aggregate => ['sum(amount) as amount'],
+      sql => <<'SQL' );
+    select
+        "date"
+      , region
+      , amount
+    from mytable
+  SQL
+
+Creates SQL around a subselect that aggregates the given
+columns.
+
+The SQL created by the call above would be
+
+    select "region"
+         , "date"
+         , sum(amount) as amount
+    from (
+        select
+            "date"
+          , region
+          , amount
+        from mytable
+    ) foo
+    group by "region, "date"
+    order by "region", "date"
+
+Note that the values in the C<columns> and C<rows> options will be automatically
+enclosed in double quotes.
+
+This function is convenient if you want to ccreate ad-hoc pivot queries instead
+of setting up the appropriate views in the database.
+
+If you want to produce subtotals, this function can be called
+with the elements removed successively from C<$options{rows}> or
+C<$options{columns}> for computing row or column totals.
+
 =cut
 
 sub pivot_sql( %options ) {
-    my @columns = (@{ $options{ columns } || [] }, @{ $options{ rows } || [] });
-    my $qcolumns = join "\n  ,  ", @columns, @{ $options{ aggregate }};
-    my $keycolumns = join "\n  ,  ", @columns;
+    my @columns = (@{ $options{ rows } || [] }, @{ $options{ columns } || []});
+    my $qcolumns = join "\n  , ", @columns, @{ $options{ aggregate }};
+    my $keycolumns = join "\n       , ", @columns;
     my $clauses = '';
     if($keycolumns) {
-    $clauses = qq{
-        group by $keycolumns
-        order by $keycolumns
-    };
+    $clauses = join "\n",
+                 "group by $keycolumns",
+                 "order by $keycolumns",
     };
 
-    return qq{
-    select
-        $qcolumns
-    from
-    (
-        $options{sql}
-    )
-    $clauses
-    }
+    return <<SQL
+select
+    $qcolumns
+  from (
+$options{sql}
+) foo
+$clauses
+SQL
 }
 
 # Takes an AoA and derives the total order from it if possible
@@ -88,11 +131,27 @@ sub partial_order( $comparator, $keygen, @list ) {
     sort { $sort{ $a } <=> $sort{$b} } keys %keys;
 }
 
-# Pivots an AoH (or AoA?!)
+# Pivots an AoH (no AoA support yet!?)
 # The list must already be sorted by @rows, @columns
 # At least one line must contain all column values (!)
+
+=head2 C<< pivot_list >>
+
+  my $l = pivot_list(
+      list => @AoH,
+      columns   => ['date'],
+      rows      => ['region'],
+      aggregate => ['amount'],
+  );
+
+The rows of C<@$l> are then plain arrays not hashes.
+The first row of C<@$l> will contain the column titles.
+
+The column titles are built from joining the pivot column values by C<$;> .
+
+=cut
+
 sub pivot_list( %options ) {
-    use Data::Dumper;
     my @rows;
     my %colnum;
     my %rownum;
@@ -126,7 +185,7 @@ sub pivot_list( %options ) {
     }
 
     if( ! @colhead) {
-        @colhead = 'dummy';
+        @colhead = $aggregates[0];
     };
 
     my $last_row;
@@ -178,5 +237,7 @@ sub pivot_by( %options ) {
 
 No subtotals, and no support for them even if you supply the
 aggregated data already
+
+Currently only one aggregate value is allowed
 
 =cut
