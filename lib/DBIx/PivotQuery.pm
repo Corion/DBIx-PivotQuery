@@ -125,6 +125,10 @@ sub pivot_list( %options ) {
         };
     }
     
+    if( ! @colhead) {
+        @colhead = 'dummy';
+    };
+
     my $last_row;
     my @row;
     for my $cell (@{ $options{ list }}) {
