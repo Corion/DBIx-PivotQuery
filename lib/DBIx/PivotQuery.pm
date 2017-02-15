@@ -154,7 +154,7 @@ sub pivot_list( %options ) {
         push @rows, \@row;
     };
     
-    unshift @rows, [ undef, @colhead ];
+    unshift @rows, [ @key_rows, @colhead ];
     
     \@rows
 }
