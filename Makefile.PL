@@ -48,7 +48,8 @@ my %module = (
         'Filter::signatures' => 0,
     },
     TEST_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More'   => 0,
+        'Data::Dumper' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

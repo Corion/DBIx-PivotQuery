@@ -2,7 +2,6 @@
 use strict;
 use Test::More tests => 1;
 use DBIx::PivotQuery 'pivot_list';
-use Text::Table;
 
 my @list = (
     { date => 'Q1', region => 'North', amount => 150 },
@@ -35,7 +34,3 @@ my $l = pivot_list(
 );
 warn Dumper $l;
 
-use Text::Table;
-my $t = Text::Table->new( @{ shift @$l });
-$t->load(@$l);
-diag "$t";
