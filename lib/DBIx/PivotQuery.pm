@@ -31,7 +31,7 @@ DBIx::PivotQuery - create pivot tables from queries
       , amount
     from mytable
   SQL
-  
+
 =cut
 
 sub pivot_sql( %options ) {
@@ -45,7 +45,7 @@ sub pivot_sql( %options ) {
         order by $keycolumns
     };
     };
-    
+
     return qq{
     select
         $qcolumns
@@ -84,7 +84,7 @@ sub partial_order( $comparator, $keygen, @list ) {
             };
         }
     }
-    
+
     sort { $sort{ $a } <=> $sort{$b} } keys %keys;
 }
 
@@ -96,14 +96,14 @@ sub pivot_list( %options ) {
     my @rows;
     my %colnum;
     my %rownum;
-    
+
     my @key_cols   = @{ $options{ columns }   || [] };
     my @key_rows   = @{ $options{ rows }      || [] };
     my @aggregates = @{ $options{ aggregate } || [] };
     my @colhead;
-    
+
     # Now we need to determine the numbers for all the columns
-    if( $options{ sort_columns } ) { 
+    if( $options{ sort_columns } ) {
         # If we have a user-supplied sorting function, use that:
         @colnum{ sort( sub { $options{ sort_columns }->($a,$b) }, keys %colnum )}
             = (@key_rows)..((@key_rows)+(keys %colnum)-1);
@@ -124,7 +124,7 @@ sub pivot_list( %options ) {
             };
         };
     }
-    
+
     if( ! @colhead) {
         @colhead = 'dummy';
     };
@@ -134,11 +134,11 @@ sub pivot_list( %options ) {
     for my $cell (@{ $options{ list }}) {
         my $colkey = join $;, @{ $cell }{ @key_cols };
         my $rowkey = join $;, @{ $cell }{ @key_rows };
-        
+
         if( defined $last_row and $rowkey ne $last_row ) {
             push @rows, [splice @row, 0];
         };
-        
+
         # We should have %row instead, but how to name the
         # columns and rows that are values now?!
         # prefix "pivot_" ?
@@ -147,7 +147,7 @@ sub pivot_list( %options ) {
         if( ! @row ) {
             @row = @{ $cell }{ @key_rows };
         };
-        
+
         my %cellv = %$cell;
         @cellv{ @aggregates } = @{$cell}{@aggregates};
         #$row[ $colnum{ $colkey }] = \%cellv;
@@ -157,9 +157,9 @@ sub pivot_list( %options ) {
     if(@row) {
         push @rows, \@row;
     };
-    
+
     unshift @rows, [ @key_rows, @colhead ];
-    
+
     \@rows
 }
 
@@ -169,7 +169,14 @@ sub pivot_list( %options ) {
 sub pivot_by( %options ) {
     croak unless $options{sql};
     croak unless $options{dbh};
-    
+
 }
 
 1;
+
+=head1 Unsupported features
+
+No subtotals, and no support for them even if you supply the
+aggregated data already
+
+=cut
