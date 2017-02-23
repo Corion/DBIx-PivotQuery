@@ -6,7 +6,7 @@ SYNOPSIS
 
       use DBIx::PivotQuery 'pivot_by';
       my $rows = pivot_by(
-          dbh => $dbh,
+          dbh       => $dbh,
           columns   => ['report_year'],
           rows      => ['region'],
           aggregate => ['sum(amount) as amount'],
@@ -17,5 +17,112 @@ SYNOPSIS
           , amount
         from mytable
       SQL
-      
+
+FUNCTIONS
+
+ pivot_sql
+
+      pivot_sql(
+          columns => ['date'],
+          rows    => ['region'],
+          aggregate => ['sum(amount) as amount'],
+          sql => <<'SQL' );
+        select
+            "date"
+          , region
+          , amount
+        from mytable
+      SQL
+
+    Creates SQL around a subselect that aggregates the given columns.
+
+    The SQL created by the call above would be
+
+        select "region"
+             , "date"
+             , sum(amount) as amount
+        from (
+            select
+                "date"
+              , region
+              , amount
+            from mytable
+        ) foo
+        group by "region, "date"
+        order by "region", "date"
+
+    Note that the values in the columns and rows options will be
+    automatically enclosed in double quotes.
+
+    This function is convenient if you want to ccreate ad-hoc pivot queries
+    instead of setting up the appropriate views in the database.
+
+    If you want to produce subtotals, this function can be called with the
+    elements removed successively from $options{rows} or $options{columns}
+    for computing row or column totals.
+
+ pivot_list
+
+      my $l = pivot_list(
+          list => @AoH,
+          columns   => ['date'],
+          rows      => ['region'],
+          aggregate => ['amount'],
+      );
+
+    The rows of @$l are then plain arrays not hashes. The first row of @$l
+    will contain the column titles.
+
+    The column titles are built from joining the pivot column values by $;
+    .
+
+ pivot_by
+
+        my $l = pivot_by(
+            dbh     => $test_dbh,
+            rows    => ['region'],
+            columns => ['date'],
+            aggregate => ['sum(amount) as amount'],
+            placeholder_values => [],
+            sql => <<'SQL',
+          select
+              region
+            , "date"
+            , amount
+            , customer
+          from mytable
+        SQL
+        );
+
+    Transforms the SQL given and returns an AoA pivot table according to
+    rows, columns and aggregate.
+
+    The last word (<c>\w+</c>) of each element of aggregate will be used as
+    the aggregate column name unless aggregate_columns is given.
+
+    Supplying undef for a column name in rows will create an empty cell in
+    that place. This is convenient when creating subtotals.
+
+Unsupported features
+
+    No subtotals, and no support for them even if you supply the aggregated
+    data already. Creating subtotals is as simple as running the SQL query
+    again with the last pivot row removed, and substitutung an empty column
+    there. This is not yet implemented. Note that for optimization, you
+    could first select the relevant (aggregated) rows into a temporary
+    table and then create the subtotals from that temporary table if query
+    performance is an issue:
+
+      select foo, sum(bar) as bar, baz
+        into #tmp_query
+        from mytable
+       where year = ?
+    
+       select foo, bar, baz from #tmp_query
+
+    Currently only one aggregate value is allowed.
+
+    Column and row aggregates ("totals") are not supported yet. Row
+    aggregates will mean heavy rewriting of the SQL to wrap the aggregate
+    function over the column names of the query.
 
