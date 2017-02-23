@@ -3,6 +3,7 @@ use strict;
 use Test::More tests => 7;
 use DBIx::PivotQuery 'pivot_by';
 use DBIx::RunSQL;
+use DBD::SQLite;
 
 my $sql = join "", <DATA>;
 

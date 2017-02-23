@@ -50,6 +50,8 @@ my %module = (
     TEST_REQUIRES => {
         'Test::More'   => 0,
         'Data::Dumper' => 0,
+        'DBD::SQLite'  => 0,
+        'DBIx::RunSQL' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
