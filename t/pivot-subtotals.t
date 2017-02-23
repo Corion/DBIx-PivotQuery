@@ -33,7 +33,7 @@ is_deeply $l->[0],
 
 my $m = pivot_by(
     dbh     => $test_dbh,
-    rows    => ['region'],
+    rows    => ['region', undef],
     columns => ['date'],
     aggregate => ['sum(amount) as amount'],
     placeholder_values => [],
@@ -47,9 +47,16 @@ my $m = pivot_by(
 SQL
 );
 
-print join "\n", map { join "\t", @$_ } @$l;
-print "---\n";
-print join "\n", map { join "\t", @$_ } @$m;
+use Text::Table;
+use Data::Dumper;
+print Dumper $l;
+my $t = Text::Table->new(@{ shift @$l });
+$t->load(@$l);
+print $t;
+
+my $t = Text::Table->new(@{ shift @$m });
+$t->load(@$m);
+print $t;
 
 __DATA__
 
