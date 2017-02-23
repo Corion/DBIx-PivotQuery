@@ -250,6 +250,9 @@ C<rows>, C<columns> and C<aggregate>.
 The last word (<c>\w+</c>) of each element of C<aggregate> will be used as the
 aggregate column name unless C<aggregate_columns> is given.
 
+Supplying C<undef> for a column name in C<rows> will create an empty cell
+in that place. This is convenient when creating subtotals.
+
 =cut
 
 sub pivot_by( %options ) {
@@ -277,8 +280,24 @@ sub pivot_by( %options ) {
 =head1 Unsupported features
 
 No subtotals, and no support for them even if you supply the
-aggregated data already
+aggregated data already. Creating subtotals is as simple as running the SQL
+query again with the last pivot row removed, and substitutung an empty column
+there. This is not yet implemented.
+Note that for optimization, you could first select the relevant (aggregated)
+rows into a temporary table and then create the subtotals from that temporary
+table if query performance is an issue:
 
-Currently only one aggregate value is allowed
+  select foo, sum(bar) as bar, baz
+    into #tmp_query
+    from mytable
+   where year = ?
+
+   select foo, bar, baz from #tmp_query
+
+Currently only one aggregate value is allowed.
+
+Column and row aggregates ("totals") are not supported yet. Row aggregates will
+mean heavy rewriting of the SQL to wrap the aggregate function over the column
+names of the query.
 
 =cut
