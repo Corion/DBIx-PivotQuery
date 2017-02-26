@@ -149,12 +149,27 @@ The first row of C<@$l> will contain the column titles.
 
 The column titles are built from joining the pivot column values by C<$;> .
 
+
+=over 4
+
+=item B<headers>
+
+  headers => 1,
+
+Whether to include the headers as the first row
+
+=back
+
 =cut
 
 sub pivot_list( %options ) {
     my @rows;
     my %colnum;
     my %rownum;
+    
+    if( ! exists $options{ headers }) {
+        $options{ headers } = 1;
+    };
 
     my @key_cols   = @{ $options{ columns }   || [] };
     my @key_rows   = @{ $options{ rows }      || [] };
@@ -217,7 +232,8 @@ sub pivot_list( %options ) {
         push @rows, \@row;
     };
 
-    unshift @rows, [ @key_rows, @colhead ];
+    unshift @rows, [ @key_rows, @colhead ]
+        if $options{ headers };
 
     \@rows
 }
