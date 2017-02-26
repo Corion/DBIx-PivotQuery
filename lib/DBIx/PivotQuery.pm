@@ -80,7 +80,7 @@ C<$options{columns}> for computing row or column totals.
 =cut
 
 sub pivot_sql( %options ) {
-    my @columns = (@{ $options{ rows } || [] }, @{ $options{ columns } || []});
+    my @columns = (grep { defined $_ } @{ $options{ rows } || [] }, @{ $options{ columns } || []});
     my $qcolumns = join "\n  , ", @columns, @{ $options{ aggregate }};
     my $keycolumns = join "\n       , ", @columns;
     my $clauses = '';
@@ -166,7 +166,7 @@ sub pivot_list( %options ) {
     my @rows;
     my %colnum;
     my %rownum;
-    
+
     if( ! exists $options{ headers }) {
         $options{ headers } = 1;
     };
@@ -199,6 +199,8 @@ sub pivot_list( %options ) {
         };
     }
 
+    my @effective_key_rows = grep { defined $_ } @key_rows; # remove placeholders
+
     if( ! @colhead) {
         @colhead = $aggregates[0];
     };
@@ -207,7 +209,7 @@ sub pivot_list( %options ) {
     my @row;
     for my $cell (@{ $options{ list }}) {
         my $colkey = join $;, @{ $cell }{ @key_cols };
-        my $rowkey = join $;, @{ $cell }{ @key_rows };
+        my $rowkey = join $;, @{ $cell }{ @effective_key_rows };
 
         if( defined $last_row and $rowkey ne $last_row ) {
             push @rows, [splice @row, 0];
@@ -219,7 +221,7 @@ sub pivot_list( %options ) {
         # Allow the user to supply names?
         # Expect the user to rename the keys?
         if( ! @row ) {
-            @row = @{ $cell }{ @key_rows };
+            @row = map { defined $_ ? $cell->{$_} : undef } @key_rows;
         };
 
         my %cellv = %$cell;
