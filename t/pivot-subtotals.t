@@ -48,13 +48,11 @@ SQL
 );
 
 use Text::Table;
-use Data::Dumper;
-print Dumper $l;
 my $t = Text::Table->new(@{ shift @$l });
 $t->load(@$l);
 print $t;
 
-my $t = Text::Table->new(@{ shift @$m });
+my $t = Text::Table->new(map {defined $_ ? $_ : {title => 'customer'} } @{ shift @$m });
 $t->load(@$m);
 print $t;
 
