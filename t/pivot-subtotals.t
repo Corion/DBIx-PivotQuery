@@ -58,6 +58,7 @@ my $subtotals = pivot_by(
     aggregate => ['sum(amount) as amount'],
     placeholder_values => [],
     subtotals => 1,
+    headers => 1,
     sql => <<'SQL',
   select
       region
@@ -67,6 +68,20 @@ my $subtotals = pivot_by(
   from mytable
 SQL
 );
+
+is 0+@$subtotals, 1 # header
+                 +5 # region+customer
+                 +4 # region
+                 +1 # totals
+   , "We get the expected number of rows";
+
+is_deeply $subtotals->[-1], [undef, undef, 575, 375, 225, 425]
+   , "The last row is the grand total";
+
+use Text::Table;
+my $t = Text::Table->new(@{ shift @$subtotals });
+$t->load(@$subtotals);
+print $t;
 
 
 __DATA__
