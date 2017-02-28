@@ -138,7 +138,7 @@ sub partial_order( $comparator, $keygen, @list ) {
 =head2 C<< pivot_list >>
 
   my $l = pivot_list(
-      list => @AoH,
+      list      => @AoH,
       columns   => ['date'],
       rows      => ['region'],
       aggregate => ['amount'],
