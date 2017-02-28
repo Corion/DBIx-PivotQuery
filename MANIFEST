@@ -9,6 +9,7 @@ README.mkdn
 t/pivot-by.t
 t/pivot-list.t
 t/pivot-sql.t
+t/pivot-subtotals.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

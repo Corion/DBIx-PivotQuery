@@ -252,6 +252,7 @@ sub pivot_list( %options ) {
         columns => ['date'],
         aggregate => ['sum(amount) as amount'],
         placeholder_values => [],
+        subtotals => 1,
         sql => <<'SQL',
       select
           region
@@ -279,7 +280,32 @@ sub pivot_by( %options ) {
     croak "Need a database handle in option 'dbh'"
         unless $options{dbh};
     $options{ placeholder_values } ||= [];
+    $options{ rows } ||= [];
 
+    if( $options{ subtotals } and ! ref $options{ subtotals }) {
+        $options{ subtotals } = [@{ $options{rows}}];
+    };
+
+    my $subtotals = delete $options{ subtotals };
+
+    my $result = simple_pivot_by( %options );
+
+    if( $subtotals ) {
+        for my $i ( reverse 0..$#$subtotals ) {
+            $subtotals->[$i] = undef;
+            my $s = simple_pivot_by(
+                %options,
+                rows => $subtotals,
+                header => 0
+            );
+            push @$result, @$s;
+        };
+    };
+
+    $result;
+}
+
+sub simple_pivot_by( %options ) {
     my $sql = pivot_sql( %options );
     my $sth = $options{ dbh }->prepare( $sql );
     $sth->execute( @{$options{ placeholder_values }} );
