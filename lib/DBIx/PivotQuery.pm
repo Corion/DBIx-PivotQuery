@@ -295,9 +295,26 @@ sub pivot_by( %options ) {
             $subtotals->[$i] = undef;
             my $s = simple_pivot_by(
                 %options,
-                rows => $subtotals,
+                rows    => $subtotals,
                 headers => 0
             );
+
+            # Now splice our subtotals into the list
+            # Wherever the subtotals key changes, insert the subtotal
+            my $p = $options{ headers } ? 1 : 0;
+            my $last;
+            while( @$s and $p < @$result ) {
+                my $curr = join "\0", @{ $result->[$p] }[0..$i-1];
+                $last ||= $curr;
+                if( $last ne $curr ) {
+                    splice @$result, $p, 0, shift @$s;
+                    $p++;
+                    $last = join "\0", @{ $result->[$p] }[0..$i-1];
+                };
+                $p++;
+            };
+
+            # Whatever remains will just be appended
             push @$result, @$s;
         };
     };
