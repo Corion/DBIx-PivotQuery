@@ -296,7 +296,7 @@ sub pivot_by( %options ) {
             my $s = simple_pivot_by(
                 %options,
                 rows => $subtotals,
-                header => 0
+                headers => 0
             );
             push @$result, @$s;
         };
