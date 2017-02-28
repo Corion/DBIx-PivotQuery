@@ -37,6 +37,7 @@ my $m = pivot_by(
     columns => ['date'],
     aggregate => ['sum(amount) as amount'],
     placeholder_values => [],
+    headers => 0,
     sql => <<'SQL',
   select
       region
@@ -47,14 +48,26 @@ my $m = pivot_by(
 SQL
 );
 
-use Text::Table;
-my $t = Text::Table->new(@{ shift @$l });
-$t->load(@$l);
-print $t;
+is_deeply [ map { $_->[1] } @$m ], [ (undef) x 4 ],
+    "The second column is empty for the subtotals by Region";
 
-my $t = Text::Table->new(map {defined $_ ? $_ : {title => 'customer'} } @{ shift @$m });
-$t->load(@$m);
-print $t;
+my $subtotals = pivot_by(
+    dbh     => $test_dbh,
+    rows    => ['region','customer'],
+    columns => ['date'],
+    aggregate => ['sum(amount) as amount'],
+    placeholder_values => [],
+    subtotals => 1,
+    sql => <<'SQL',
+  select
+      region
+    , "date"
+    , amount
+    , customer
+  from mytable
+SQL
+);
+
 
 __DATA__
 
