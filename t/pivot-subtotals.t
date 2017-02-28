@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 4;
 use DBIx::PivotQuery 'pivot_by';
 use DBIx::RunSQL;
 use DBD::SQLite;
@@ -78,10 +78,10 @@ is 0+@$subtotals, 1 # header
 is_deeply $subtotals->[-1], [undef, undef, 575, 375, 225, 425]
    , "The last row is the grand total";
 
-use Text::Table;
-my $t = Text::Table->new(@{ shift @$subtotals });
-$t->load(@$subtotals);
-print $t;
+#use Text::Table;
+#my $t = Text::Table->new(@{ shift @$subtotals });
+#$t->load(@$subtotals);
+#print $t;
 
 
 __DATA__
