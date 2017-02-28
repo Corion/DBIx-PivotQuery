@@ -64,7 +64,7 @@ FUNCTIONS
  pivot_list
 
       my $l = pivot_list(
-          list => @AoH,
+          list      => @AoH,
           columns   => ['date'],
           rows      => ['region'],
           aggregate => ['amount'],
@@ -76,6 +76,12 @@ FUNCTIONS
     The column titles are built from joining the pivot column values by $;
     .
 
+    headers
+
+        headers => 1,
+
+      Whether to include the headers as the first row
+
  pivot_by
 
         my $l = pivot_by(
@@ -84,6 +90,7 @@ FUNCTIONS
             columns => ['date'],
             aggregate => ['sum(amount) as amount'],
             placeholder_values => [],
+            subtotals => 1,
             sql => <<'SQL',
           select
               region
@@ -103,15 +110,10 @@ FUNCTIONS
     Supplying undef for a column name in rows will create an empty cell in
     that place. This is convenient when creating subtotals.
 
-Unsupported features
-
-    No subtotals, and no support for them even if you supply the aggregated
-    data already. Creating subtotals is as simple as running the SQL query
-    again with the last pivot row removed, and substitutung an empty column
-    there. This is not yet implemented. Note that for optimization, you
-    could first select the relevant (aggregated) rows into a temporary
-    table and then create the subtotals from that temporary table if query
-    performance is an issue:
+    Subtotals are calculated by repeatedly running the query. For
+    optimization, you could first select the relevant (aggregated) rows
+    into a temporary table and then create the subtotals from that
+    temporary table if query performance is an issue:
 
       select foo, sum(bar) as bar, baz
         into #tmp_query
@@ -120,9 +122,11 @@ Unsupported features
     
        select foo, bar, baz from #tmp_query
 
+Unsupported features
+
     Currently only one aggregate value is allowed.
 
-    Column and row aggregates ("totals") are not supported yet. Row
-    aggregates will mean heavy rewriting of the SQL to wrap the aggregate
-    function over the column names of the query.
+    Row aggregates ("totals") are not supported yet. Row aggregates will
+    mean heavy rewriting of the SQL to wrap the aggregate function over the
+    column names of the query.
 
