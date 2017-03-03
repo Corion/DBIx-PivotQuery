@@ -303,7 +303,7 @@ sub pivot_list( %options ) {
     \@rows
 }
 
-=head2 pivot_sql
+=head2 C<< pivot_sql >>
 
   pivot_sql(
       columns => ['date'],
