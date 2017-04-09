@@ -34,13 +34,13 @@ DBIx::PivotQuery - create pivot tables from queries
 
 The above code returns a data structure roughly like
 
-  [
-    ['region','1','2',...,'11','12'],
-    ['East',   0,  0 ,..., 10, 20 ],
-    ['North',  0,  1 ,..., 10, 20 ],
-    ['South',  0,  3 ,..., 10, 5  ],
-    ['West',   0,  6 ,..., 8,  20 ],
-  ]
+  # [
+  #   ['region','1','2',...,'11','12'],
+  #   ['East',   0,  0 ,..., 10, 20 ],
+  #   ['North',  0,  1 ,..., 10, 20 ],
+  #   ['South',  0,  3 ,..., 10, 5  ],
+  #   ['West',   0,  6 ,..., 8,  20 ],
+  # ]
 
 =head1 FUNCTIONS
 
