@@ -377,4 +377,36 @@ Row aggregates ("totals") are not supported yet. Row aggregates will
 mean heavy rewriting of the SQL to wrap the aggregate function over the column
 names of the query.
 
+=head1 SEE ALSO
+
+L<DBI>
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<http://github.com/Corion/DBIx-PivotQuery>.
+
+=head1 SUPPORT
+
+The public support forum of this module is
+L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-PivotQuery>
+or via mail to L<dbix-pivotquery-Bugs@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2017 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
 =cut

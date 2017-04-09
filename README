@@ -152,3 +152,34 @@ Unsupported features
     mean heavy rewriting of the SQL to wrap the aggregate function over the
     column names of the query.
 
+SEE ALSO
+
+    DBI
+
+REPOSITORY
+
+    The public repository of this module is
+    http://github.com/Corion/DBIx-PivotQuery.
+
+SUPPORT
+
+    The public support forum of this module is https://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-PivotQuery or
+    via mail to dbix-pivotquery-Bugs@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2017 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+
