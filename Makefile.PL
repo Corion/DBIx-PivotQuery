@@ -1,5 +1,5 @@
+#!perl -w
 # -*- mode: perl; c-basic-offset: 4; indent-tabs-mode: nil; -*-
-
 use strict;
 use ExtUtils::MakeMaker qw(WriteMakefile);
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -12,6 +12,7 @@ $eumm_version =~ s/_//;
 
 my $module = 'DBIx::PivotQuery';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
+(my $distname = $module) =~ s!::!-!g;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -27,15 +28,16 @@ my %module = (
                 web => 'https://github.com/Corion/dbix-pivotquery',
                 url => 'git://github.com/Corion/dbix-pivotquery.git',
                 type => 'git',
-            }
+            },
+            bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=' . $distname,
+            license    => 'http://dev.perl.org/licenses/',
         },
+        dynamic_config   => 0, # we promise to keep META.* up-to-date
+        x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
     
     MIN_PERL_VERSION => '5.006',
-
-    ($eumm_version >= 6.3001
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    LICENSE          => 'perl',
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
@@ -55,7 +57,7 @@ my %module = (
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'DBIx-PivotQuery-*' },
+    clean               => { FILES => "$distname-*" },
 
     test            => { TESTS => join( ' ', @tests ) },
 );
@@ -72,8 +74,6 @@ if( ! caller ) {
     #regen_EXAMPLES();
     WriteMakefile1(get_module_info);
 };
-
-1;
 
 sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
     my %params=@_;
@@ -124,3 +124,5 @@ sub regen_README {
         print $fh $parser->as_markdown;
     };
 }
+
+1;
